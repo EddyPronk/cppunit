@@ -4,6 +4,7 @@
 #if CPPUNIT_HAVE_RTTI
 
 #include <string>
+#include <cstdlib>
 
 #if CPPUNIT_HAVE_GCC_ABI_DEMANGLE
 #include <cxxabi.h>
