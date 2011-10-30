@@ -298,7 +298,7 @@
         ( new CPPUNIT_NS::TestCaller<TestFixtureType>(    \
                   context.getTestNameFor( #testMethod),   \
                   &TestFixtureType::testMethod,           \
-                  context.makeFixture() ) ) )
+                  context.cloneFactory() ) ) )
 
 /*! \brief Add a test which fail if the specified exception is not caught.
  *

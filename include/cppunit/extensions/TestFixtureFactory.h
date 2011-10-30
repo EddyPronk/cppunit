@@ -18,6 +18,7 @@ class TestFixtureFactory
 public:
   //! Creates a new TestFixture instance.
   virtual TestFixture *makeFixture() =0;
+  virtual TestFixtureFactory *clone() =0;
 
   virtual ~TestFixtureFactory() {}
 };
@@ -40,6 +41,11 @@ class ConcretTestFixtureFactory : public CPPUNIT_NS::TestFixtureFactory
   {
     return new TestFixtureType();
   }
+  TestFixtureFactory *clone()
+  {
+  	return new ConcretTestFixtureFactory(*this);
+  }
+
 };
 
 

@@ -74,6 +74,11 @@ public:
    */
   const std::string getStringProperty( const std::string &key ) const;
 
+  TestFixtureFactory *cloneFactory() const
+  {
+	  return m_factory.clone();
+  }
+
 protected:
   TestFixture *makeTestFixture() const;
 

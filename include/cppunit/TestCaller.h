@@ -3,6 +3,7 @@
 
 #include <cppunit/Exception.h>
 #include <cppunit/TestCase.h>
+#include <cppunit/extensions/TestFixtureFactory.h>
 
 
 #if CPPUNIT_USE_TYPEINFO_NAME
@@ -106,80 +107,41 @@ class TestCaller : public TestCase
   typedef void (Fixture::*TestMethod)();
     
 public:
-  /*!
-   * Constructor for TestCaller. This constructor builds a new Fixture
-   * instance owned by the TestCaller.
-   * \param name name of this TestCaller
-   * \param test the method this TestCaller calls in runTest()
-   */
-  TestCaller( std::string name, TestMethod test ) :
-	    TestCase( name ), 
-	    m_ownFixture( true ),
-	    m_fixture( new Fixture() ),
-	    m_test( test )
-  {
-  }
-
-  /*!
-   * Constructor for TestCaller. 
-   * This constructor does not create a new Fixture instance but accepts
-   * an existing one as parameter. The TestCaller will not own the
-   * Fixture object.
-   * \param name name of this TestCaller
-   * \param test the method this TestCaller calls in runTest()
-   * \param fixture the Fixture to invoke the test method on.
-   */
-  TestCaller(std::string name, TestMethod test, Fixture& fixture) :
-	    TestCase( name ), 
-	    m_ownFixture( false ),
-	    m_fixture( &fixture ),
-	    m_test( test )
-  {
-  }
     
   /*!
    * Constructor for TestCaller. 
-   * This constructor does not create a new Fixture instance but accepts
-   * an existing one as parameter. The TestCaller will own the
-   * Fixture object and delete it in its destructor.
    * \param name name of this TestCaller
    * \param test the method this TestCaller calls in runTest()
-   * \param fixture the Fixture to invoke the test method on.
+   * \param factory the TestFixtureFactory.
    */
-  TestCaller(std::string name, TestMethod test, Fixture* fixture) :
+  TestCaller(std::string name, TestMethod test, TestFixtureFactory* factory) :
 	    TestCase( name ), 
-	    m_ownFixture( true ),
-	    m_fixture( fixture ),
-	    m_test( test )
+	    m_fixture( 0 ),
+	    m_test( test ),
+      m_factory( factory )
   {
-  }
-    
-  ~TestCaller() 
-  {
-    if (m_ownFixture)
-      delete m_fixture;
   }
 
+  ~TestCaller()
+  {
+    delete m_factory;
+  }
+    
   void runTest()
   { 
-//	  try {
 	    (m_fixture->*m_test)();
-//	  }
-//	  catch ( ExpectedException & ) {
-//	    return;
-//	  }
-
-//  	ExpectedExceptionTraits<ExpectedException>::expectedException();
   }  
 
   void setUp()
   { 
+	  m_fixture = static_cast<Fixture*>(m_factory->makeFixture());
   	m_fixture->setUp (); 
   }
 
   void tearDown()
   { 
 	  m_fixture->tearDown (); 
+	  delete m_fixture;
   }
 
   std::string toString() const
@@ -192,9 +154,9 @@ private:
   TestCaller &operator =( const TestCaller &other );
 
 private:
-  bool m_ownFixture;
   Fixture *m_fixture;
   TestMethod m_test;
+  TestFixtureFactory *m_factory;
 };
 
 
